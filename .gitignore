@@ -1,0 +1,12 @@
+# Secrets
+.env
+
+# Environnement virtuel
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Articles téléchargés et fichiers calculés (recréés par script)
+data/
