@@ -1,6 +1,7 @@
 """Recall@k and MRR of dense retrieval on the answerable questions of eval/questions.jsonl."""
 import json
 from pathlib import Path
+import sys
 
 from sentence_transformers import SentenceTransformer
 
@@ -44,5 +45,5 @@ report = {
         for lang in sorted({q["lang"] for q in answerable})
     },
 }
-RESULTS_FILE.write_text(json.dumps(report, indent=2), encoding="utf-8")
+RESULTS_FILE = ROOT / "results" / f"{sys.argv[1] if len(sys.argv) > 1 else 'exp01_retrieval_baseline'}.json"
 print(json.dumps(report, indent=2))

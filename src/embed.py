@@ -2,7 +2,7 @@
 import json
 import time
 from pathlib import Path
-
+import sys
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
@@ -11,7 +11,7 @@ CHUNKS_FILE = ROOT / "data" / "chunks.jsonl"
 EMBEDDINGS_FILE = ROOT / "data" / "embeddings.npy"
 INFO_FILE = ROOT / "data" / "embeddings_info.json"
 
-MODEL_NAME = "intfloat/multilingual-e5-small"
+MODEL_NAME = sys.argv[1] if len(sys.argv) > 1 else "intfloat/multilingual-e5-small"
 PASSAGE_PREFIX = "passage: "  # e5 models are trained with this prefix on documents
 
 with CHUNKS_FILE.open(encoding="utf-8") as f:
