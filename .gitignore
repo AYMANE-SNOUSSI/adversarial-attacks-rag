@@ -10,3 +10,5 @@ __pycache__/
 
 # Articles téléchargés et fichiers calculés (recréés par script)
 data/
+
+eval/questions_draft.jsonl
