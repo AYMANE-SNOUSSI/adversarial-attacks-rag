@@ -11,12 +11,25 @@ CHUNKS_FILE = ROOT / "data" / "chunks.jsonl"
 EMBEDDINGS_FILE = ROOT / "data" / "embeddings.npy"
 INFO_FILE = ROOT / "data" / "embeddings_info.json"
 
-MODEL_NAME = sys.argv[1] if len(sys.argv) > 1 else "intfloat/multilingual-e5-small"
+args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
+MODEL_NAME = args[0] if args else "intfloat/multilingual-e5-small"
+WITH_TITLES = "--titles" in sys.argv  # prepend the paper title to each chunk
 PASSAGE_PREFIX = "passage: "  # e5 models are trained with this prefix on documents
 
 with CHUNKS_FILE.open(encoding="utf-8") as f:
     chunks = [json.loads(line) for line in f]
-texts = [PASSAGE_PREFIX + chunk["text"] for chunk in chunks]
+metadata = json.loads((ROOT / "data" / "metadata.json").read_text(encoding="utf-8"))
+
+
+def to_text(chunk):
+    """Text actually embedded for a chunk, optionally headed by its paper title."""
+    body = chunk["text"]
+    if WITH_TITLES:
+        body = f"{metadata[chunk['arxiv_id']]['title']}. {body}"
+    return PASSAGE_PREFIX + body
+
+
+texts = [to_text(chunk) for chunk in chunks]
 
 model = SentenceTransformer(MODEL_NAME)
 token_counts = [len(ids) for ids in model.tokenizer(texts)["input_ids"]]
@@ -28,6 +41,7 @@ elapsed = time.perf_counter() - start
 
 np.save(EMBEDDINGS_FILE, embeddings.astype(np.float32))
 INFO_FILE.write_text(json.dumps({
+    "with_titles": WITH_TITLES,
     "model": MODEL_NAME,
     "n_chunks": len(chunks),
     "dim": int(embeddings.shape[1]),
