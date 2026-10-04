@@ -1,0 +1,15 @@
+{
+  "model": "intfloat/multilingual-e5-base",
+  "n_questions": 25,
+  "recall": {
+    "@1": 0.56,
+    "@3": 0.72,
+    "@5": 0.8,
+    "@10": 0.92
+  },
+  "mrr": 0.672,
+  "recall@5_by_lang": {
+    "en": 0.81,
+    "fr": 0.75
+  }
+}

@@ -9,7 +9,7 @@ from search import load_index, search
 
 ROOT = Path(__file__).resolve().parent.parent
 QUESTIONS_FILE = ROOT / "eval" / "questions.jsonl"
-RESULTS_FILE = ROOT / "results" / "exp01_retrieval_baseline.json"
+RESULTS_FILE = ROOT / "results" / f"{sys.argv[1] if len(sys.argv) > 1 else 'exp01_retrieval_baseline'}.json"
 KS = (1, 3, 5, 10)
 
 with QUESTIONS_FILE.open(encoding="utf-8") as f:
