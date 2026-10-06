@@ -1,0 +1,25 @@
+{
+  "complete": true,
+  "n_evaluated": 30,
+  "retrieval": "intfloat/multilingual-e5-small",
+  "answer_model": "gemini-3.5-flash",
+  "judge_model": "gemini-3.1-flash-lite",
+  "answerable": {
+    "n": 25,
+    "answered": 0.76,
+    "correct": 0.76,
+    "cites_relevant_page": 0.72,
+    "answered_without_relevant_page": [
+      "q013"
+    ]
+  },
+  "unanswerable": {
+    "n": 5,
+    "correct_refusals": 1.0
+  },
+  "invalid_citations": 0,
+  "mean_tokens": 2209,
+  "llm_calls": {
+    "gemini-3.5-flash": 30
+  }
+}
