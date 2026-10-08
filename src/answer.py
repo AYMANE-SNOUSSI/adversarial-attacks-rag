@@ -4,6 +4,8 @@ import os
 import re
 import sys
 import time
+import logging
+import httpx
 
 from dotenv import load_dotenv
 from google import genai
@@ -11,6 +13,8 @@ from google.genai import errors, types
 from sentence_transformers import SentenceTransformer
 
 from search import DATA, load_index, search
+
+log = logging.getLogger(__name__)
 
 LLM_MODELS = ["gemini-3.5-flash", "gemini-3.8-flash"]  # tried in order when overloaded
 TOP_K = 5
@@ -35,21 +39,28 @@ def build_prompt(question, retrieved, metadata):
     return "Passages:\n\n" + "\n\n".join(blocks) + f"\n\nQuestion: {question}"
 
 
-def generate(client, prompt, llm_models=LLM_MODELS):
-    """Try each model in turn, retrying transient errors (429/5xx) with backoff."""
+def generate(client, prompt, llm_models=LLM_MODELS, attempts=3):
+    """Try each model in turn: retry overloads (5xx) with backoff, skip a model out of quota (429)."""
     config = types.GenerateContentConfig(
         system_instruction=SYSTEM_PROMPT,
         thinking_config=types.ThinkingConfig(thinking_level="low"),
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
     )
     for llm in llm_models:
-        for attempt in range(3):
+        for attempt in range(attempts):
             try:
                 return llm, client.models.generate_content(model=llm, contents=prompt, config=config)
             except errors.APIError as error:
                 if error.code not in (429, 500, 503):
                     raise
-                time.sleep(5 * 2**attempt)
+                reason = error.code
+            except httpx.TransportError as error:  # connection dropped or timed out
+                reason = type(error).__name__
+            log.warning("%s: %s (attempt %d/%d)", llm, reason, attempt + 1, attempts)
+            if reason == 429:
+                break  # out of quota: retrying this model cannot help
+            if attempt < attempts - 1:
+                time.sleep(2 * 2**attempt)
     raise RuntimeError("All Gemini models are unavailable, try again later")
 
 

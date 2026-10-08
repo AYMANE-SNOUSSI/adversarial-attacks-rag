@@ -6,3 +6,7 @@ sentence-transformers==6.1.0
 transformers==5.17.0
 torch==5.17.0
 numpy==2.5.3
+fastapi== 0.142.2
+uvicorn==0.54.0
+pytest==9.1.1
+httpx==0.28.1
