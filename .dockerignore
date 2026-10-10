@@ -1,0 +1,13 @@
+# Secrets: never send the API key into an image
+.env
+
+# Large or unused in the image
+.venv/
+.git/
+data/pdfs/
+data/pages.jsonl
+exploration/
+results/
+eval/
+__pycache__/
+*.pyc

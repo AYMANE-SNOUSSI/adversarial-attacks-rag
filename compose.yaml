@@ -1,0 +1,19 @@
+services:
+  api:
+    build: .
+    image: arxiv-rag  # built once, reused by the app service
+    env_file: .env  # GEMINI_API_KEY, given at run time and never stored in the image
+    ports:
+      - "8000:8000"
+
+  app:
+    image: arxiv-rag
+    pull_policy: never  # use the local image built for api, never download it
+    command: ["streamlit", "run", "src/app.py",
+              "--server.address", "0.0.0.0", "--server.port", "8501", "--server.headless", "true"]
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
