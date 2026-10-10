@@ -1,4 +1,5 @@
 # adversarial-attacks-rag
+[![CI](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/ci.yml)
 
 Ask questions about 44 research papers on adversarial attacks in computer vision. Every answer cites the paper and page it comes from, and the system says so when the answer is not in the papers.
 
