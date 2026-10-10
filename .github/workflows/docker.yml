@@ -1,0 +1,30 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - requirements.txt
+      - src/**
+      - corpus/**
+      - .github/workflows/docker.yml
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build the image (rebuilds the index from arXiv)
+        run: docker build -t adversarial-attacks-rag .
+      - name: Smoke test (the API loads the model and the index, then answers /health)
+        run: |
+          docker run -d --name api -p 8000:8000 -e GEMINI_API_KEY=dummy adversarial-attacks-rag
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8000/health; then exit 0; fi
+            sleep 2
+          done
+          docker logs api
+          exit 1
