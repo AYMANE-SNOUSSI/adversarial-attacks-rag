@@ -1,4 +1,4 @@
-# arxiv-rag
+# adversarial-attacks-rag
 
 Ask questions about 44 research papers on adversarial attacks in computer vision. Every answer cites the paper and page it comes from, and the system says so when the answer is not in the papers.
 

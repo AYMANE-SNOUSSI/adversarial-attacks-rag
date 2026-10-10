@@ -15,7 +15,7 @@ METADATA_FILE = DATA_DIR / "metadata.json"
 API_URL = "https://export.arxiv.org/api/query"
 PDF_URL = "https://arxiv.org/pdf/{}"
 ATOM = "{http://www.w3.org/2005/Atom}"
-HEADERS = {"User-Agent": "arxiv-rag/0.1 (https://github.com/AYMANE-SNOUSSI)"}
+HEADERS = {"User-Agent": "adversarial-attacks-rag/0.1 (https://github.com/AYMANE-SNOUSSI)"}
 DELAY_S = 3  # arXiv asks for at most one request every 3 seconds
 RETRY_STATUS = {406, 429, 500, 502, 503, 504}
 

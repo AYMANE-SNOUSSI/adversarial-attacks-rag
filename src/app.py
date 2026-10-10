@@ -13,8 +13,8 @@ EXAMPLES = [
     "Comment peut-on protéger une image contre une modification par un modèle de diffusion ?",
 ]
 
-st.set_page_config(page_title="arxiv-rag")
-st.title("arxiv-rag")
+st.set_page_config(page_title="adversarial-attacks-rag")
+st.title("adversarial-attacks-rag")
 st.caption(
     "Answers from 44 arXiv papers on adversarial attacks in computer vision, "
     "with the paper and page behind every claim."

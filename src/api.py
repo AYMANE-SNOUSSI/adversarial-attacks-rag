@@ -66,7 +66,7 @@ async def lifespan(app):
     yield
 
 
-app = FastAPI(title="arxiv-rag", lifespan=lifespan)
+app = FastAPI(title="adversarial-attacks-rag", lifespan=lifespan)
 
 
 @app.get("/health")
