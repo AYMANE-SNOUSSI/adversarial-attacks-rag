@@ -8,6 +8,8 @@ import os
 import requests
 import streamlit as st
 
+from citations import renumber
+
 API_URL = os.getenv("API_URL")
 EXAMPLES = [
     "What is a universal adversarial perturbation?",
@@ -86,9 +88,10 @@ if submitted:
     if not result["found"]:
         st.info("The answer is not in the 44 papers of the corpus.")
     else:
-        st.markdown(result["answer"])  # renders $...$ formulas
+        answer, sources = renumber(result["answer"], result["sources"])
+        st.markdown(answer)  # renders $...$ formulas
         st.subheader("Sources")
-        for source in result["sources"]:
+        for source in sources:
             paper = f"https://arxiv.org/abs/{source['arxiv_id']}"
             pdf_page = f"https://arxiv.org/pdf/{source['arxiv_id']}#page={source['page']}"
             st.markdown(
