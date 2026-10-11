@@ -1,11 +1,10 @@
 """HTTP API: POST /ask answers a question from the corpus and returns its sources."""
-import json
-import os
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
+
+from engine import Engine
 
 
 class AskRequest(BaseModel):
@@ -25,28 +24,6 @@ class AskResponse(BaseModel):
     answer: str | None
     sources: list[Source]
     llm: str
-
-
-class Engine:
-    """Index, embedding model and Gemini client, loaded once."""
-
-    def __init__(self):
-        # Heavy imports stay here so the API module (and its tests) load without them.
-        from google import genai
-        from sentence_transformers import SentenceTransformer
-
-        from search import DATA, load_index
-
-        load_dotenv()
-        self.client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-        model_name, self.embeddings, self.chunks = load_index()
-        self.embedder = SentenceTransformer(model_name)
-        self.metadata = json.loads((DATA / "metadata.json").read_text(encoding="utf-8"))
-
-    def ask(self, question):
-        from answer import answer
-
-        return answer(question, self.embedder, self.embeddings, self.chunks, self.metadata, self.client)
 
 
 _engine = None

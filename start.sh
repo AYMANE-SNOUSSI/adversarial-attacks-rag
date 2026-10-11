@@ -12,4 +12,5 @@ until python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1
     sleep 1
 done
 
+export API_URL=http://127.0.0.1:8000  # the web interface calls the API above
 exec streamlit run src/app.py --server.address 0.0.0.0 --server.port 7860 --server.headless true

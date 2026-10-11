@@ -29,3 +29,13 @@ jobs:
           done
           docker logs app
           exit 1
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Publish the index to the private Hugging Face dataset
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          docker cp app:/app/data ./index
+          pip install huggingface_hub==1.33.0
+          hf upload AymaneGAZI/adversarial-attacks-rag-index ./index . --repo-type dataset --commit-message "Index built from ${GITHUB_SHA::7}"

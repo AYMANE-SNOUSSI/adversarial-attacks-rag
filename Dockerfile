@@ -2,11 +2,8 @@
 FROM python:3.12-slim AS base
 WORKDIR /app
 
-# The extra index provides CPU-only PyTorch wheels; the default Linux wheel bundles
-# several GB of CUDA libraries that this app never uses.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt \
-    --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Download the embedding model at build time so containers start fast and offline.
 ENV HF_HOME=/app/.cache/huggingface
