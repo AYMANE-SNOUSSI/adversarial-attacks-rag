@@ -1,7 +1,10 @@
 # adversarial-attacks-rag
 [![CI](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/ci.yml)
+[![Docker](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/docker.yml/badge.svg)](https://github.com/AYMANE-SNOUSSI/adversarial-attacks-rag/actions/workflows/docker.yml)
 
-Ask questions about 44 research papers on adversarial attacks in computer vision. Every answer cites the paper and page it comes from, and the system says so when the answer is not in the papers.
+**Live demo: [adversarial-attacks-rag.streamlit.app](https://adversarial-attacks-rag.streamlit.app)**
+
+Ask questions about 44 research papers on adversarial attacks in computer vision, in English or French. Every answer cites the paper and page it comes from, and the system says so when the answer is not in the papers.
 
 ```
 > python src/answer.py "How many training images are used to compute a universal perturbation in Moosavi-Dezfooli et al.?"
@@ -44,7 +47,22 @@ flowchart LR
     D --> R --> L[Gemini: answer only<br/>from the passages] --> O[Answer + paper, page, link]
 ```
 
-PyMuPDF · `multilingual-e5-small` · NumPy · Gemini 3.5 Flash (free tier)
+The same engine (`src/engine.py`) serves a FastAPI endpoint (`POST /ask`) and the Streamlit interface.
+
+PyMuPDF · `multilingual-e5-small` · NumPy · Gemini 3.5 Flash (free tier) · FastAPI · Streamlit · Docker · GitHub Actions
+
+## Deployment
+
+```mermaid
+flowchart LR
+    P[git push] --> T[CI: API tests]
+    P --> B[Docker workflow: build the image,<br/>rebuild the index from arXiv, smoke test]
+    B --> H[(Private Hugging Face dataset:<br/>prebuilt index)]
+    P --> S[Streamlit Community Cloud<br/>redeploys the app]
+    H -->|downloaded at startup| S
+```
+
+The paper text is never committed: the index is rebuilt from arXiv in CI and stored in a private dataset that only the app can read.
 
 ## Run it
 
@@ -54,20 +72,33 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Add a `.env` file with `GEMINI_API_KEY=your_key` (free key from Google AI Studio), then:
+Add a `.env` file with `GEMINI_API_KEY=your_key` (free key from Google AI Studio), then build the index:
 
 ```powershell
 python src/fetch_corpus.py
 python src/extract_text.py
 python src/chunk.py
 python src/embed.py intfloat/multilingual-e5-small --titles
-python src/answer.py "your question"
 ```
+
+Then use it from the command line, the web interface or the API:
+
+```powershell
+python src/answer.py "your question"
+streamlit run src/app.py
+uvicorn api:app --app-dir src
+```
+
+Or with Docker, which builds the index inside the image: `docker compose up --build`, then open http://localhost:8501.
+
+Tests: `pytest`.
 
 ## Limitations
 
 - Small evaluation set: 30 questions from 4 of the 44 papers.
 - Formulas are poorly extracted from PDFs, so questions about the exact form of an equation tend to fail.
-- The Gemini free tier allows 20 requests per day per model.
+- French answers sometimes keep an English term or use an awkward translation of a technical word.
+- The Gemini free tier allows 20 requests per day per model (two models are used in turn).
+- The demo sleeps after 12 hours without visits and takes 1 to 2 minutes to wake up.
 
 Design choices, all experiments and the analysis of every failure: [docs/evaluation.md](docs/evaluation.md).
