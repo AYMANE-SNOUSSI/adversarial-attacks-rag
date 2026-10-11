@@ -23,12 +23,18 @@ RUN python src/fetch_corpus.py \
 
 # Stage 3: runtime image, with the index but without the PDFs or the extracted pages.
 FROM base
+# Hugging Face Spaces run the container as user 1000.
+RUN useradd -m -u 1000 user
 COPY src/ src/
+COPY start.sh .
 COPY --from=index /app/data/chunks.jsonl /app/data/embeddings.npy \
      /app/data/embeddings_info.json /app/data/metadata.json data/
 
 ENV HF_HUB_OFFLINE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    HOME=/home/user
+USER user
 
-EXPOSE 8000 8501
-CMD ["uvicorn", "api:app", "--app-dir", "src", "--host", "0.0.0.0", "--port", "8000"]
+# Default: the whole app (API + web interface on port 7860). compose.yaml runs each part separately.
+EXPOSE 7860
+CMD ["sh", "start.sh"]

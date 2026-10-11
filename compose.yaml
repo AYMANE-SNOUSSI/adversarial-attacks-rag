@@ -2,6 +2,7 @@ services:
   api:
     build: .
     image: adversarial-attacks-rag  # built once, reused by the app service
+    command: ["uvicorn", "api:app", "--app-dir", "src", "--host", "0.0.0.0", "--port", "8000"]
     env_file: .env  # GEMINI_API_KEY, given at run time and never stored in the image
     ports:
       - "8000:8000"
