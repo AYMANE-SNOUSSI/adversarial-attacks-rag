@@ -49,7 +49,7 @@ flowchart LR
 
 Each chunk is stored in a ChromaDB collection (`src/vector_store.py`) with its vector, its text, its paper and its page, and the top 5 come from `collection.query`. The first version kept the vectors in a NumPy array and the texts in a separate file, matched by line order. ChromaDB keeps them together and allows filtering by paper or adding papers without rebuilding everything.
 
-ChromaDB's HNSW index is approximate: with default settings, on synthetic vectors of the same size, its top 5 differed from exact search on 14 to 45% of queries. With `ef_search` set to 1000, the top 10 matched exact search on every query. `src/compare_search.py` runs the same check against the former NumPy index on the 30 evaluation questions.
+ChromaDB's HNSW index is approximate: with default settings, on synthetic vectors of the same size, its top 5 differed from exact search on 14 to 45% of queries. With `ef_search` set to 1000, the top 10 matched exact search on every query. On the 30 evaluation questions, `src/compare_search.py` found the same top 10, in the same order, as the former NumPy index, and recall@k and MRR are unchanged ([exp05](results/exp05_chromadb.json)).
 
 The same engine (`src/engine.py`) serves a FastAPI endpoint (`POST /ask`) and the Streamlit interface.
 
