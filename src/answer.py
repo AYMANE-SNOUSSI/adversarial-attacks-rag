@@ -64,9 +64,9 @@ def generate(client, prompt, llm_models=LLM_MODELS, attempts=3):
     raise RuntimeError("All Gemini models are unavailable, try again later")
 
 
-def answer(question, embedder, embeddings, chunks, metadata, client, llm_models=LLM_MODELS):
+def answer(question, embedder, collection, metadata, client, llm_models=LLM_MODELS):
     """Retrieve, generate, then map each [n] back to its paper and page."""
-    retrieved = search(question, embedder, embeddings, chunks, k=TOP_K)
+    retrieved = search(question, embedder, collection, k=TOP_K)
     llm, response = generate(client, build_prompt(question, retrieved, metadata), llm_models)
     text = response.text.strip()
     cited = sorted({int(n) for n in CITATION.findall(text)})
@@ -94,11 +94,11 @@ def answer(question, embedder, embeddings, chunks, metadata, client, llm_models=
 if __name__ == "__main__":
     load_dotenv()
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-    model_name, embeddings, chunks = load_index()
+    model_name, collection = load_index()
     embedder = SentenceTransformer(model_name)
     metadata = json.loads((DATA / "metadata.json").read_text(encoding="utf-8"))
 
-    result = answer(sys.argv[1], embedder, embeddings, chunks, metadata, client)
+    result = answer(sys.argv[1], embedder, collection, metadata, client)
     if not result["found"]:
         print("No answer in the corpus: the retrieved passages do not contain it.")
     else:

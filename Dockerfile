@@ -24,8 +24,9 @@ FROM base
 RUN useradd -m -u 1000 user
 COPY src/ src/
 COPY start.sh .
-COPY --from=index /app/data/chunks.jsonl /app/data/embeddings.npy \
-     /app/data/embeddings_info.json /app/data/metadata.json data/
+# The vector database belongs to the app user: ChromaDB opens its files for writing.
+COPY --from=index --chown=user:user /app/data/chroma data/chroma
+COPY --from=index /app/data/embeddings_info.json /app/data/metadata.json data/
 
 ENV HF_HUB_OFFLINE=1 \
     PYTHONUNBUFFERED=1 \

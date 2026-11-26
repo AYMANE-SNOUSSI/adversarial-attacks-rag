@@ -1,0 +1,39 @@
+name: Compare NumPy and ChromaDB retrieval
+
+# One-off check of the move to ChromaDB, run on GitHub's machines: rebuilds the ChromaDB index
+# from the chunks of the former NumPy index, then compares their results on the 30 eval questions.
+on:
+  push:
+    branches: [chromadb]
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Tests
+        run: pytest -q
+      - name: Download the former NumPy index from the private dataset
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: >
+          hf download AymaneGAZI/adversarial-attacks-rag-index
+          chunks.jsonl embeddings.npy embeddings_info.json metadata.json
+          --repo-type dataset --local-dir data
+      - name: Build the ChromaDB index from the same chunks
+        run: python src/embed.py intfloat/multilingual-e5-small --titles
+      - name: Same vectors, same top 10 on every question
+        run: python src/compare_search.py
+      - name: Recall@k and MRR with ChromaDB
+        run: python src/eval_retrieval.py exp05_chromadb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp05_chromadb
+          path: results/exp05_chromadb.json

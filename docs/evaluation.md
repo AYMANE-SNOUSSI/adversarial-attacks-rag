@@ -89,7 +89,7 @@ The two refusals with the "right page" retrieved are a measurement artefact, con
 python src/fetch_corpus.py                                  # check IDs on arXiv, download the pinned PDFs
 python src/extract_text.py                                  # data/pages.jsonl
 python src/chunk.py                                         # data/chunks.jsonl
-python src/embed.py intfloat/multilingual-e5-small --titles # data/embeddings.npy
+python src/embed.py intfloat/multilingual-e5-small --titles # data/chroma (vector database)
 python src/eval_retrieval.py exp03_e5_small_titles          # retrieval metrics
 python src/eval_generation.py exp04_generation              # end-to-end metrics (resumable)
 ```

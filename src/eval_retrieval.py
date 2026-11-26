@@ -16,13 +16,13 @@ with QUESTIONS_FILE.open(encoding="utf-8") as f:
     questions = [json.loads(line) for line in f if line.strip()]
 answerable = [q for q in questions if q["answerable"]]
 
-model_name, embeddings, chunks = load_index()
+model_name, collection = load_index()
 model = SentenceTransformer(model_name)
 
 first_ranks = {}
 for q in answerable:
     targets = {(ref["arxiv_id"], ref["page"]) for ref in q["relevant"]}
-    results = search(q["question"], model, embeddings, chunks, k=max(KS))
+    results = search(q["question"], model, collection, k=max(KS))
     ranks = [rank for rank, (_, chunk) in enumerate(results, 1)
              if (chunk["arxiv_id"], chunk["page"]) in targets]
     first_ranks[q["id"]] = ranks[0] if ranks else None  # None: not in the top max(KS)
@@ -45,5 +45,5 @@ report = {
         for lang in sorted({q["lang"] for q in answerable})
     },
 }
-RESULTS_FILE = ROOT / "results" / f"{sys.argv[1] if len(sys.argv) > 1 else 'exp01_retrieval_baseline'}.json"
+RESULTS_FILE.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 print(json.dumps(report, indent=2))
