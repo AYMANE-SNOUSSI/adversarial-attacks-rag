@@ -96,7 +96,7 @@ def share(records, test):
 
 load_dotenv()
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
-model_name, embeddings, chunks = load_index()
+model_name, collection = load_index()
 embedder = SentenceTransformer(model_name)
 metadata = json.loads((DATA / "metadata.json").read_text(encoding="utf-8"))
 with QUESTIONS_FILE.open(encoding="utf-8") as f:
@@ -114,7 +114,7 @@ with DETAILS_FILE.open("a", encoding="utf-8") as out:
         if q["id"] in done:
             continue
         try:
-            result = answer(q["question"], embedder, embeddings, chunks, metadata, client,
+            result = answer(q["question"], embedder, collection, metadata, client,
                             llm_models=[ANSWER_MODEL])
             time.sleep(PAUSE_S)
             record = evaluate(q, result)

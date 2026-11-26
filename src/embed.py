@@ -1,4 +1,4 @@
-"""Embed every chunk; row i of data/embeddings.npy is line i of data/chunks.jsonl."""
+"""Embed every chunk and store it in the vector database (data/chroma) with its text, paper and page."""
 import json
 import time
 from pathlib import Path
@@ -6,9 +6,10 @@ import sys
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
+from vector_store import add_chunks, create_collection, open_client
+
 ROOT = Path(__file__).resolve().parent.parent
 CHUNKS_FILE = ROOT / "data" / "chunks.jsonl"
-EMBEDDINGS_FILE = ROOT / "data" / "embeddings.npy"
 INFO_FILE = ROOT / "data" / "embeddings_info.json"
 
 args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
@@ -39,11 +40,12 @@ start = time.perf_counter()
 embeddings = model.encode(texts, batch_size=32, normalize_embeddings=True, show_progress_bar=True)
 elapsed = time.perf_counter() - start
 
-np.save(EMBEDDINGS_FILE, embeddings.astype(np.float32))
+collection = create_collection(open_client())
+add_chunks(collection, chunks, embeddings.astype(np.float32))
 INFO_FILE.write_text(json.dumps({
     "with_titles": WITH_TITLES,
     "model": MODEL_NAME,
-    "n_chunks": len(chunks),
+    "n_chunks": collection.count(),
     "dim": int(embeddings.shape[1]),
     "encode_seconds": round(elapsed, 1),
 }, indent=2), encoding="utf-8")
