@@ -102,7 +102,7 @@ Tests: `pytest`.
 - Small evaluation set: 30 questions from 4 of the 44 papers.
 - Formulas are poorly extracted from PDFs, so questions about the exact form of an equation tend to fail.
 - French answers sometimes keep an English term or use an awkward translation of a technical word.
-- The Gemini free tier allows 20 requests per day per model (two models are used in turn).
+- The Gemini free tier allows 20 requests per day per model (three models are used in turn).
 - The demo sleeps after 12 hours without visits and takes 1 to 2 minutes to wake up.
 
 Design choices, all experiments and the analysis of every failure: [docs/evaluation.md](docs/evaluation.md).

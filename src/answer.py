@@ -16,8 +16,7 @@ from search import DATA, load_index, search
 
 log = logging.getLogger(__name__)
 
-LLM_MODELS = ["gemini-3.5-flash", "gemini-3.8-flash"]  # tried in order when overloaded
-TOP_K = 5
+LLM_MODELS = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-flash-lite"]  # tried in order when overloadedTOP_K = 5
 NOT_FOUND = "NOT_FOUND"
 CITATION = re.compile(r"\[(\d+)\]")
 
